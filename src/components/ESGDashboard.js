@@ -1,11 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import icons from '../assets/icons';
+
+const iconMap = {
+  'Data protection / cyber-security': 'Data-protection',
+  'Honest / transparent accounting practices': 'Transparent-accounting',
+  'Fair pricing (companies fairly pricing their products or services)': 'Fair-pricing',
+  'Degree to which business growth looks sustainable over the long term': 'Sustainable-growth',
+  'Supporting the humane treatment of animals': 'Animal-treatment',
+  'Supporting the conservation of oceans and marine life': 'Marine-life',
+  'Avoiding water waste': 'Water-waste',
+  'High regard for staff health / safety': 'Health-safety',
+  'Fair treatment of and remuneration for company employees': 'Fair-remuneration',
+  'Supporting cuts to pollution / carbon emissions': 'Cut-pollution',
+  "A company's ethical values": 'Ethical-value',
+  'Supporting the preservation of natural capital (e.g. biodiversity eliminating waste etc.)': 'Natural-capital',
+  'Supporting action against climate change (e.g. company carbon footprint)': 'Climate-change',
+  'Supporting the combat against global poverty': 'Global-poverty',
+  'Supporting healthy lives and well-being for all people': 'Well-being',
+  'Do not engage in morally questionable business (e.g. nicotine alcohol gambling pornography)': 'Questionable-business',
+  'Supporting the local community / local infrastructure': 'Infrastructure',
+  'Supporting access to quality education': 'Education',
+  'Shareholder voting rights': 'Shareholder-voting',
+  'Clean transportation (i.e. EV batteries shared mobility freight)': 'Clean-transportation',
+  'Supporting diversity and inclusion (e.g. employment policies gender equality agenda etc.)': 'Diversity-inclusion',
+  "A company's partnership / supplier organisations": 'Partnership',
+  'Profits / donations given to charity': 'Charity-donation'
+};
+
+const getCategoryColor = (category, isHovered = false) => {
+  const colors = {
+    'E': ['#9fd9b4', '#7ac092'], // Normal, Hover
+    'S': ['#027180', '#015868'],
+    'G': ['#00adc6', '#0089a3'],
+    'default': ['gray', 'darkgray']
+  };
+  return colors[category] ? colors[category][isHovered ? 1 : 0] : colors['default'][isHovered ? 1 : 0];
+};
 
 const ESGDashboard = () => {
   const [data, setData] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState('Global');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAllFactors, setShowAllFactors] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,32 +118,34 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
     { name: 'G', color: '#00adc6' },
   ];
 
-  const getCategoryColor = (category) => {
-    const cat = categories.find(c => c.name === category);
-    return cat ? cat.color : 'gray';
-  };
+  const barHeight = 35; // Set your desired bar height here (in pixels)
+  const hoverBarHeight = 55; // Set your desired hover bar height here (in pixels)
+  const iconSize = 25; // Set your desired icon size here (in pixels)
+  const hoverIconSize = 38; // Set your desired hover icon size here (in pixels)
+
+  const labelRef = useRef(null);
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">ESG Criteria Rankings Dashboard</h1>
+      {/*<h1 className="text-2xl mb-4 font-custom">ESG Criteria Rankings Dashboard</h1>*/}
       
       <div className="flex justify-between items-center mb-4">
         <select 
           value={selectedRegion} 
           onChange={(e) => setSelectedRegion(e.target.value)}
-          className="border p-2 rounded"
+          className="mt-4 px-4 py-2 bg-blue-light text-white hover:bg-blue-dark transition-colors"
         >
           {regions.map(region => (
             <option key={region} value={region}>{region}</option>
           ))}
         </select>
-        
+
         <div className="flex space-x-2">
           {categories.map(cat => (
             <button
               key={cat.name}
               onClick={() => setSelectedCategory(cat.name)}
-              className={`px-3 py-1 rounded ${selectedCategory === cat.name ? 'text-white' : 'bg-gray-200'}`}
+              className={`px-3 py-1 ${selectedCategory === cat.name ? 'text-white' : 'bg-gray-200'}`}
               style={{ 
                 backgroundColor: selectedCategory === cat.name ? cat.color : undefined,
                 color: selectedCategory === cat.name ? (cat.name === 'E' ? 'black' : 'white') : 'black'
@@ -112,49 +155,96 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
             </button>
           ))}
         </div>
+
       </div>
 
-      <button 
-        onClick={() => setShowAllFactors(!showAllFactors)}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-      >
-        {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
-      </button>
-
       <div 
-        className="relative overflow-hidden" 
+        className="relative overflow-visible" 
         style={{ 
-          height: `${displayedData.length * 44}px`,
+          height: `${displayedData.length * (barHeight + 3.5)}px`,
           transition: 'height 0.5s ease-in-out' 
         }}
       >
         <AnimatePresence>
-          {displayedData.map((item, index) => (
-            <motion.div
-              key={item.name}
-              initial={{ opacity: 0, y: index < 10 ? 20 : -20 }}
-              animate={{ opacity: 1, y: index * 44 }}
-              exit={{ opacity: 0, y: index < 10 ? -20 : 20 }}
-              transition={{ duration: 0.5 }}
-              className="absolute w-full h-10 mb-1"
-              style={{ top: 0 }}
-            >
-              <div 
-                className="h-full flex items-center relative"
-                style={{ 
-                  width: `${item.value}%`, 
-                  backgroundColor: getCategoryColor(item.category),
+          {displayedData.map((item, index) => {
+            const iconKey = iconMap[item.name] || 'Data-protection';
+            const IconComponent = icons[iconKey];
+            return (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, y: index * (barHeight + 3) }}
+                animate={{ 
+                  opacity: 1, 
+                  y: index * (barHeight + 3) + (hoveredIndex !== null && index > hoveredIndex ? (hoverBarHeight - barHeight) : 0),
+                  zIndex: hoveredIndex === index ? 10 : 1,
+                  transition: { type: 'spring', stiffness: 300, damping: 30 }
                 }}
+                exit={{ opacity: 0, y: index * (barHeight + 3) }}
+                className="absolute w-full mb-1" // Added margin-bottom
+                style={{ height: `${barHeight}px` }}
               >
-                <span className="absolute left-2 text-sm text-white text-shadow">{item.name}</span>
-                <span className="absolute right-2 text-sm text-white text-shadow">{item.value.toFixed(1)}%</span>
-              </div>
-            </motion.div>
-          ))}
+                <motion.div 
+                  className="h-full flex items-center justify-between relative px-2 transition-all duration-300 ease-in-out"
+                  style={{ 
+                    width: `${Math.max(item.value, 15)}%`, 
+                    backgroundColor: getCategoryColor(item.category),
+                    minWidth: '300px',
+                    transformOrigin: 'center left',
+                  }}
+                  whileHover={{
+                    backgroundColor: getCategoryColor(item.category, true),
+                    scaleY: 1.04,
+                    height: `${hoverBarHeight}px`,
+                    transition: { duration: 0.3 }
+                  }}
+                  onHoverStart={() => setHoveredIndex(index)}
+                  onHoverEnd={() => setHoveredIndex(null)}
+                >
+                  <div className="flex items-center space-x-2 overflow-hidden" style={{maxWidth: 'calc(100% - 70px)'}}>
+                    {IconComponent && (
+                      <motion.div 
+                        className="flex-shrink-0 transition-all duration-300 ease-in-out"
+                        style={{ 
+                          width: `${iconSize}px`, 
+                          height: `${iconSize}px` 
+                        }}
+                        animate={{
+                          width: hoveredIndex === index ? `${hoverIconSize}px` : `${iconSize}px`,
+                          height: hoveredIndex === index ? `${hoverIconSize}px` : `${iconSize}px`,
+                        }}
+                      >
+                        <IconComponent className="w-full h-full text-white" />
+                      </motion.div>
+                    )}
+                    <motion.span 
+                      ref={labelRef}
+                      className="text-sm text-white text-shadow whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out flex-grow"
+                      style={{ 
+                        fontSize: hoveredIndex === index ? '16px' : '14px',
+                      }}
+                    >
+                      {item.name}
+                    </motion.span>
+                  </div>
+                  <motion.span 
+                    className="text-sm font-custom text-white text-shadow ml-2 flex-shrink-0 transition-all duration-300 ease-in-out"
+                    style={{ fontSize: hoveredIndex === index ? '20px' : '16px' }}
+                  >
+                    {item.value.toFixed(1)}%
+                  </motion.span>
+                </motion.div>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
-
-      <div className="mt-4">
+      <button 
+          onClick={() => setShowAllFactors(!showAllFactors)}
+          className="mt-4 px-4 py-2 border-2 border-blue-light font-semibold text-blue-light hover:text-white hover:bg-blue-dark hover:border-blue-dark transition-colors"
+      >
+          {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
+        </button>
+      {/* <div className="mt-4">
         <h2 className="text-xl font-semibold mb-2">Key Insights for {selectedRegion}</h2>
         <ul className="list-disc pl-5">
           <li>Top factor: {filteredData[0]?.name} ({filteredData[0]?.value.toFixed(2)}%)</li>
@@ -168,7 +258,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
           <li>{filteredData.filter(item => item.category === 'S').length} Social factors in {showAllFactors ? 'total' : 'top 10'}</li>
           <li>{filteredData.filter(item => item.category === 'G').length} Governance factors in {showAllFactors ? 'total' : 'top 10'}</li>
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };
