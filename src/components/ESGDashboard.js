@@ -33,11 +33,11 @@ const regionAbbreviations = {
   'Europe': 'EU',
   'Asia': 'Asia',
   'UK': 'UK',
-  'Belgium': 'Bel',
-  'Germany': 'Ger',
-  'Spain': 'Sp',
-  'France': 'Fr',
-  'Italy': 'It',
+  'Belgium': 'BEL',
+  'Germany': 'GER',
+  'Spain': 'SP',
+  'France': 'FR',
+  'Italy': 'IT',
   'Hong Kong': 'HK',
   'Japan': 'JP',
   'Philippines': 'PH',
@@ -184,7 +184,12 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
       {/*<h1 className="text-2xl mb-4 font-custom">ESG Criteria Rankings Dashboard</h1>*/}
       
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">{selectedRegion}</h2>
+      <div className="flex items-center">
+          <h2 className="text-xl font-semibold">{selectedRegion}</h2>
+          {!showAllFactors && (
+            <h2 className="ml-1 text-xl">(Top 10)</h2>
+          )}
+        </div>
         <div className="flex space-x-2">
           {categories.map(cat => (
             <button
@@ -205,7 +210,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
       <div 
         className="relative overflow-hidden" 
         style={{ 
-          height: `${displayedData.length * (barHeight + 5)}px`,
+          height: `${displayedData.length * (barHeight + 4.5)}px`,
           transition: 'height 0.5s ease-in-out' 
         }}
       >
@@ -288,7 +293,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
       </div>
       <button 
           onClick={() => setShowAllFactors(!showAllFactors)}
-          className="mt-4 px-4 py-2 border-2 border-blue-light font-semibold text-blue-light hover:text-white hover:bg-blue-dark hover:border-blue-dark transition-colors"
+          className="mt-4 px-4 py-2 bg-cobalt-light font-semibold text-white hover:text-white hover:bg-blue-light transition-colors"
       >
           {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
         </button>

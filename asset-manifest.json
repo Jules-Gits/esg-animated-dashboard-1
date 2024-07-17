@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/esg-animated-dashboard-1/static/css/main.90be831b.css",
-    "main.js": "/esg-animated-dashboard-1/static/js/main.fc05658c.js",
+    "main.css": "/esg-animated-dashboard-1/static/css/main.a121df59.css",
+    "main.js": "/esg-animated-dashboard-1/static/js/main.d4723df4.js",
     "static/js/453.63c2452b.chunk.js": "/esg-animated-dashboard-1/static/js/453.63c2452b.chunk.js",
     "static/media/Spain.svg": "/esg-animated-dashboard-1/static/media/Spain.0e2356ad9abe4a8bc45eeba0e0921054.svg",
     "static/media/Climate-change.svg": "/esg-animated-dashboard-1/static/media/Climate-change.f825ed0be807f9214709f9c2c1a68e1f.svg",
@@ -43,12 +43,12 @@
     "static/media/Thailand.svg": "/esg-animated-dashboard-1/static/media/Thailand.7baa56c713b3319f0f2f15bcfc58ef91.svg",
     "static/media/Indonesia.svg": "/esg-animated-dashboard-1/static/media/Indonesia.6a0d6efb1c3aac1bab060bc27f0cc52c.svg",
     "static/media/France.svg": "/esg-animated-dashboard-1/static/media/France.d4f987908ff9a845be57a3b75a3632ee.svg",
-    "main.90be831b.css.map": "/esg-animated-dashboard-1/static/css/main.90be831b.css.map",
-    "main.fc05658c.js.map": "/esg-animated-dashboard-1/static/js/main.fc05658c.js.map",
+    "main.a121df59.css.map": "/esg-animated-dashboard-1/static/css/main.a121df59.css.map",
+    "main.d4723df4.js.map": "/esg-animated-dashboard-1/static/js/main.d4723df4.js.map",
     "453.63c2452b.chunk.js.map": "/esg-animated-dashboard-1/static/js/453.63c2452b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.90be831b.css",
-    "static/js/main.fc05658c.js"
+    "static/css/main.a121df59.css",
+    "static/js/main.d4723df4.js"
   ]
 }
