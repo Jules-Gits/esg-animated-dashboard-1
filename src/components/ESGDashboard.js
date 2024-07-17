@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import icons from '../assets/icons';
 
@@ -165,14 +165,28 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
   const displayedData = showAllFactors ? filteredData : filteredData.slice(0, 10);
 
   const categories = [
-    { name: 'All', color: 'gray' },
-    { name: 'E', color: '#9fd9b4' },
-    { name: 'S', color: '#027180' },
-    { name: 'G', color: '#00adc6' },
+    { name: 'All', color: '#718096', hoverColor: '#4a5568' }, // Changed color to a lighter gray
+    { name: 'E', color: '#9fd9b4', hoverColor: '#7ac092' },
+    { name: 'S', color: '#027180', hoverColor: '#015868' },
+    { name: 'G', color: '#00adc6', hoverColor: '#0089a3' },
   ];
 
+  const handleMouseEnter = useCallback((e, category) => {
+    e.target.style.backgroundColor = category.hoverColor;
+    e.target.style.color = category.name === 'E' ? 'black' : 'white';
+  }, []);
+
+  const handleMouseLeave = useCallback((e, category) => {
+    if (category.name !== selectedCategory) {
+      e.target.style.backgroundColor = '#e2e8f0';
+      e.target.style.color = 'black';
+    } else {
+      e.target.style.backgroundColor = category.color;
+      e.target.style.color = category.name === 'E' ? 'black' : 'white';
+    }
+  }, [selectedCategory]);
+
   const barHeight = 35; // Set your desired bar height here (in pixels)
-  
   const hoverBarHeight = 55; // Set your desired hover bar height here (in pixels)
   const iconSize = 25; // Set your desired icon size here (in pixels)
   const hoverIconSize = 38; // Set your desired hover icon size here (in pixels)
@@ -183,7 +197,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
     <div className="p-4 max-w-6xl mx-auto">
       {/*<h1 className="text-2xl mb-4 font-custom">ESG Criteria Rankings Dashboard</h1>*/}
       
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-8">
       <div className="flex items-center">
           <h2 className="text-xl font-semibold">{selectedRegion}</h2>
           {!showAllFactors && (
@@ -191,18 +205,28 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
           )}
         </div>
         <div className="flex space-x-2">
+        <button 
+          onClick={() => setShowAllFactors(!showAllFactors)}
+          className="px-4 py-2 bg-cobalt-light text-white hover:text-white hover:bg-cobalt-hover transition-colors"
+      >
+          {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
+        </button>
           {categories.map(cat => (
             <button
-              key={cat.name}
-              onClick={() => setSelectedCategory(cat.name)}
-              className={`px-3 py-1 ${selectedCategory === cat.name ? 'text-white' : 'bg-gray-200'}`}
-              style={{ 
-                backgroundColor: selectedCategory === cat.name ? cat.color : undefined,
-                color: selectedCategory === cat.name ? (cat.name === 'E' ? 'black' : 'white') : 'black'
-              }}
-            >
-              {cat.name}
-            </button>
+            key={cat.name}
+            onClick={() => setSelectedCategory(cat.name)}
+            className={`px-3 py-1 transition-colors duration-200 ease-in-out`}
+            style={{ 
+              backgroundColor: selectedCategory === cat.name ? cat.color : '#e2e8f0',
+              color: selectedCategory === cat.name 
+                ? (cat.name === 'E' ? 'black' : 'white')
+                : 'black',
+            }}
+            onMouseEnter={(e) => handleMouseEnter(e, cat)}
+            onMouseLeave={(e) => handleMouseLeave(e, cat)}
+          >
+            {cat.name}
+          </button>
           ))}
         </div>
       </div>
@@ -291,15 +315,10 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
           })}
         </AnimatePresence>
       </div>
-      <button 
-          onClick={() => setShowAllFactors(!showAllFactors)}
-          className="mt-4 px-4 py-2 bg-cobalt-light font-semibold text-white hover:text-white hover:bg-blue-light transition-colors"
-      >
-          {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
-        </button>
+
       
       {/* Region Slider */}
-      <div className="mt-8">
+      <div className="mt-4">
                 {/* Flag icons
                 <div className="flex justify-between mb-2">
           {regions.map(region => {
@@ -313,7 +332,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
         </div> */}
 
         {/* Slider */}
-        <div className="mt-8">
+        <div className="mt-2">
           <div className="w-full relative" ref={sliderRef}>
             <input
               type="range"
