@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         'blue-light': '#2425aa',
         'blue-dark': '#00005c',
+        'cobalt-light': '#5e83c2',
       },
       fontFamily: {'custom': ['PublicoWeb'],}
     },

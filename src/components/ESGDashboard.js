@@ -28,6 +28,24 @@ const iconMap = {
   'Profits / donations given to charity': 'Charity-donation'
 };
 
+const regionAbbreviations = {
+  'Global': 'Global',
+  'Europe': 'EU',
+  'Asia': 'Asia',
+  'UK': 'UK',
+  'Belgium': 'Bel',
+  'Germany': 'Ger',
+  'Spain': 'Sp',
+  'France': 'Fr',
+  'Italy': 'It',
+  'Hong Kong': 'HK',
+  'Japan': 'JP',
+  'Philippines': 'PH',
+  'Singapore': 'SG',
+  'Thailand': 'TH',
+  'Indonesia': 'ID'
+};
+
 const getCategoryColor = (category, isHovered = false) => {
   const colors = {
     'E': ['#9fd9b4', '#7ac092'], // Normal, Hover
@@ -44,9 +62,8 @@ const ESGDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAllFactors, setShowAllFactors] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  
-
-
+  const [sliderValue, setSliderValue] = useState(0);
+  const [labelPositions, setLabelPositions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,6 +119,42 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
   }, []);
 
   const regions = data ? Object.keys(data) : [];
+  const sliderRef = useRef(null);
+  const labelsContainerRef = useRef(null);
+
+  useEffect(() => {
+    const calculateLabelPositions = () => {
+      if (sliderRef.current && labelsContainerRef.current) {
+        const sliderRect = sliderRef.current.getBoundingClientRect();
+        const labelsContainerRect = labelsContainerRef.current.getBoundingClientRect();
+        const thumbWidth = 20; // Approximate width of the slider thumb
+        const availableWidth = sliderRect.width - thumbWidth;
+        const startOffset = thumbWidth / 2;
+        
+        const positions = regions.map((_, index) => {
+          const percentage = index / (regions.length - 1);
+          return startOffset + percentage * availableWidth;
+        });
+        
+        setLabelPositions(positions);
+      }
+    };
+
+    calculateLabelPositions();
+    window.addEventListener('resize', calculateLabelPositions);
+    return () => window.removeEventListener('resize', calculateLabelPositions);
+  }, [regions]);
+
+  useEffect(() => {
+    if (regions.length > 0) {
+      setSelectedRegion(regions[sliderValue]);
+    }
+  }, [sliderValue, regions]);
+
+  const handleSliderChange = (event) => {
+    const newValue = Number(event.target.value);
+    setSliderValue(newValue);
+  };
 
   const filteredData = data && data[selectedRegion]
     ? data[selectedRegion]
@@ -119,6 +172,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
   ];
 
   const barHeight = 35; // Set your desired bar height here (in pixels)
+  
   const hoverBarHeight = 55; // Set your desired hover bar height here (in pixels)
   const iconSize = 25; // Set your desired icon size here (in pixels)
   const hoverIconSize = 38; // Set your desired hover icon size here (in pixels)
@@ -130,16 +184,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
       {/*<h1 className="text-2xl mb-4 font-custom">ESG Criteria Rankings Dashboard</h1>*/}
       
       <div className="flex justify-between items-center mb-4">
-        <select 
-          value={selectedRegion} 
-          onChange={(e) => setSelectedRegion(e.target.value)}
-          className="mt-4 px-4 py-2 bg-blue-light text-white hover:bg-blue-dark transition-colors"
-        >
-          {regions.map(region => (
-            <option key={region} value={region}>{region}</option>
-          ))}
-        </select>
-
+        <h2 className="text-xl font-semibold">{selectedRegion}</h2>
         <div className="flex space-x-2">
           {categories.map(cat => (
             <button
@@ -155,17 +200,16 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
             </button>
           ))}
         </div>
-
       </div>
 
       <div 
-        className="relative overflow-visible" 
+        className="relative overflow-hidden" 
         style={{ 
-          height: `${displayedData.length * (barHeight + 3.5)}px`,
+          height: `${displayedData.length * (barHeight + 5)}px`,
           transition: 'height 0.5s ease-in-out' 
         }}
       >
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {displayedData.map((item, index) => {
             const iconKey = iconMap[item.name] || 'Data-protection';
             const IconComponent = icons[iconKey];
@@ -177,10 +221,14 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
                   opacity: 1, 
                   y: index * (barHeight + 3) + (hoveredIndex !== null && index > hoveredIndex ? (hoverBarHeight - barHeight) : 0),
                   zIndex: hoveredIndex === index ? 10 : 1,
-                  transition: { type: 'spring', stiffness: 300, damping: 30 }
                 }}
-                exit={{ opacity: 0, y: index * (barHeight + 3) }}
-                className="absolute w-full mb-1" // Added margin-bottom
+                exit={{ 
+                  opacity: 0, 
+                  y: (index + 1) * (barHeight + 4),
+                  transition: { duration: 0.3 }
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="absolute w-full mb-1"
                 style={{ height: `${barHeight}px` }}
               >
                 <motion.div 
@@ -195,7 +243,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
                     backgroundColor: getCategoryColor(item.category, true),
                     scaleY: 1.04,
                     height: `${hoverBarHeight}px`,
-                    transition: { duration: 0.3 }
+                    transition: { duration: 0.1 }
                   }}
                   onHoverStart={() => setHoveredIndex(index)}
                   onHoverEnd={() => setHoveredIndex(null)}
@@ -203,7 +251,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
                   <div className="flex items-center space-x-2 overflow-hidden" style={{maxWidth: 'calc(100% - 70px)'}}>
                     {IconComponent && (
                       <motion.div 
-                        className="flex-shrink-0 transition-all duration-300 ease-in-out"
+                        className="flex-shrink-0 transition-all duration-200 ease-in-out"
                         style={{ 
                           width: `${iconSize}px`, 
                           height: `${iconSize}px` 
@@ -218,7 +266,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
                     )}
                     <motion.span 
                       ref={labelRef}
-                      className="text-sm text-white text-shadow whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out flex-grow"
+                      className="text-sm text-white text-shadow whitespace-nowrap overflow-hidden transition-all duration-200 ease-in-out flex-grow"
                       style={{ 
                         fontSize: hoveredIndex === index ? '16px' : '14px',
                       }}
@@ -227,7 +275,7 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
                     </motion.span>
                   </div>
                   <motion.span 
-                    className="text-sm font-custom text-white text-shadow ml-2 flex-shrink-0 transition-all duration-300 ease-in-out"
+                    className="text-sm font-custom text-white text-shadow ml-2 flex-shrink-0 transition-all duration-200 ease-in-out"
                     style={{ fontSize: hoveredIndex === index ? '20px' : '16px' }}
                   >
                     {item.value.toFixed(1)}%
@@ -244,6 +292,51 @@ Profits / donations given to charity,S,54.72,51.03,58.40,50.40,46.40,46.50,55.50
       >
           {showAllFactors ? "Show Top 10 Factors" : "Show All Factors"}
         </button>
+      
+      {/* Region Slider */}
+      <div className="mt-8">
+                {/* Flag icons
+                <div className="flex justify-between mb-2">
+          {regions.map(region => {
+            const FlagIcon = icons[region] || icons['Global']; // Fallback to Global if icon not found
+            return (
+              <div key={region} className="w-6 h-6">
+                <FlagIcon className="w-full h-full" />
+              </div>
+            );
+          })}
+        </div> */}
+
+        {/* Slider */}
+        <div className="mt-8">
+          <div className="w-full relative" ref={sliderRef}>
+            <input
+              type="range"
+              min="0"
+              max={regions.length - 1}
+              step="1"
+              value={sliderValue}
+              onChange={handleSliderChange}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-cobalt-light"
+            />
+            
+            {/* Precisely Aligned Region labels */}
+            <div className="absolute w-full top-8 left-0 right-0" ref={labelsContainerRef}>
+              {regions.map((region, index) => (
+                <span 
+                  key={region} 
+                  className={`absolute text-xs transform -translate-x-1/2 ${
+                    index === sliderValue ? 'font-bold text-cobalt-light' : ''
+                  }`}
+                  style={{ left: `${labelPositions[index]}px` }}
+                >
+                  {regionAbbreviations[region] || region}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+       </div> 
       {/* <div className="mt-4">
         <h2 className="text-xl font-semibold mb-2">Key Insights for {selectedRegion}</h2>
         <ul className="list-disc pl-5">

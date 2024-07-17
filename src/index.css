@@ -16,3 +16,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Thumb styles for WebKit browsers (Chrome, Safari) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; 
+  background: #5e83c2; /* Tailwind's cobalt-light */
+  cursor: pointer;
+}
+
+/* Thumb styles for Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5e83c2; /* Tailwind's cobalt-light */
+  cursor: pointer;
+  border: none;
+}

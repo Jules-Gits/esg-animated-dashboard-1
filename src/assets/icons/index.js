@@ -21,6 +21,21 @@ import { ReactComponent as CleanTransportation } from './Clean-transportation.sv
 import { ReactComponent as DiversityInclusion } from './Diversity-inclusion.svg';
 import { ReactComponent as Partnership } from './Partnership.svg';
 import { ReactComponent as CharityDonation } from './Charity-donation.svg';
+import { ReactComponent as Philippines } from './Philippines.svg';
+import { ReactComponent as Singapore } from './Singapore.svg';
+import { ReactComponent as Spain } from './Spain.svg';
+import { ReactComponent as Thailand } from './Thailand.svg';
+import { ReactComponent as UK } from './UK.svg';
+import { ReactComponent as France } from './France.svg';
+import { ReactComponent as Germany } from './Germany.svg';
+import { ReactComponent as Global } from './Global.svg';
+import { ReactComponent as HongKong } from './Hong-Kong.svg';
+import { ReactComponent as Indonesia } from './Indonesia.svg';
+import { ReactComponent as Italy } from './Italy.svg';
+import { ReactComponent as Japan } from './Japan.svg';
+import { ReactComponent as Asia } from './Asia.svg';
+import { ReactComponent as Belgium } from './Belgium.svg';
+import { ReactComponent as EU } from './EU.svg';
 
 const icons = {
   'Data-protection': DataProtection,
@@ -46,6 +61,21 @@ const icons = {
   'Diversity-inclusion': DiversityInclusion,
   'Partnership': Partnership,
   'Charity-donation': CharityDonation,
+  'Philippines': Philippines,
+  'Spain': Spain,
+  'Singapore': Singapore,
+  'Thailand': Thailand,
+  'UK': UK,
+  'France': France,
+  'Germany': Germany,
+  'Global': Global,
+  'Hong-Kong': HongKong,
+  'Indonesia': Indonesia,
+  'Italy': Italy,
+  'Japan': Japan,
+  'Asia': Asia,
+  'Belgium': Belgium,
+  'EU': EU,
 };
 
 export default icons;
